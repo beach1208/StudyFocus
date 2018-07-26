@@ -2,6 +2,10 @@ package com.example.nagi.studyfocus;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -9,8 +13,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +37,16 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,16 +55,22 @@ public class MainActivity extends AppCompatActivity {
     private Button startButton;
     private Button pauseButton;
     private Button resetButton;
+    private Button checkResultBtn;
 
     private CountDownTimer countDownTimer;
 
-    private boolean mTimerRunning;
 
+    private boolean mTimerRunning;
     private long startTimeInMillis;
     private long timeLeftInMills;
     private long endTime;
+    private long millsInput;
+    private String timeInput;
+    private Integer timeData;
 
+    private RealmResults<Day> days;
 
+// TODO: 2018-07-25 1.Get timer time  2.check result onclick, pass studied time to graph.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
         startButton = findViewById(R.id.startButton);
         pauseButton = findViewById(R.id.stopButton);
         resetButton = findViewById(R.id.resetButton);
-
-
+        checkResultBtn = findViewById(R.id.checkGraphBtn);
 
 
         setButton.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                                  **/
                                 switch (which){
                                     case 0:
-                                        which = 10;
+                                        which = 1;
                                         break;
                                     case 1:
                                         which = 20;
@@ -104,8 +122,9 @@ public class MainActivity extends AppCompatActivity {
                                     default:
                                         break;
                                 }
-                                String input = Integer.toString(which);
-                                long millsInput = Long.parseLong(input) * 60000;
+                                timeData = which;
+                                timeInput = Integer.toString(which);
+                                millsInput = Long.parseLong(timeInput) * 60000;
                                 setTime(millsInput);
                                 return true;
                             }
@@ -121,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startTimer();
+
             }
         });
 
@@ -140,6 +160,20 @@ public class MainActivity extends AppCompatActivity {
                 resetTimer();
             }
         });
+
+        checkResultBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,GraphActivity.class);
+                intent.putExtra("main","test");
+                startActivity(intent);
+
+            }
+
+        });
+
+        Day daysGetter = new Day();
+        days = daysGetter.getDays(this);
 
     }
 
@@ -166,19 +200,44 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 mTimerRunning = false;
+                Date date = new Date();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                String formatedDate = sdf.format(date);
+
+                Realm.init(MainActivity.this);
+                Realm realm = Realm.getDefaultInstance();
+
+                if (realm.where(Day.class).contains("dayName", formatedDate).count() == 0) {
+                    Day day = new Day(formatedDate);
+                    day.setTimeData(timeData);
+                    day.setTimeData(50);
+                    realm.beginTransaction();
+                    realm.copyToRealm(day);
+                    realm.commitTransaction();
+
+                } else {
+                    realm.beginTransaction();
+                    Day dayInDB = realm.where(Day.class).contains("dayName", formatedDate).findFirst();
+                    int oldTime = dayInDB.getTimeData();
+                    dayInDB.setTimeData(oldTime+timeData);
+                    realm.commitTransaction();
+                }
+
+
                 updateCountDownText();
             }
         }.start();
 
         mTimerRunning = true;
-//        updateWatchInterface();
     }
+
+
 
 
     private void pauseTimer() {
         countDownTimer.cancel();
         mTimerRunning = false;
-//        updateWatchInterface();
     }
 
 
@@ -186,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
     private void resetTimer() {
         timeLeftInMills = startTimeInMillis;
         updateCountDownText();
-//        updateWatchInterface();
     }
 
 
@@ -208,8 +266,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    private void updateWatchInterface() {
-//    }
 
     private void closeKeyboard() {
         View view = this.getCurrentFocus();
