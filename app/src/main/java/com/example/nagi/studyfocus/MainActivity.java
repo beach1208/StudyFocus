@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -56,8 +57,10 @@ public class MainActivity extends AppCompatActivity {
     private Button pauseButton;
     private Button resetButton;
     private Button checkResultBtn;
+    private Switch switchButton;
 
     private CountDownTimer countDownTimer;
+    private MediaPlayer mediaPlayer;
 
 
     private boolean mTimerRunning;
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RealmResults<Day> days;
 
-// TODO: 2018-07-25 1.Get timer time  2.check result onclick, pass studied time to graph.
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,24 @@ public class MainActivity extends AppCompatActivity {
         pauseButton = findViewById(R.id.stopButton);
         resetButton = findViewById(R.id.resetButton);
         checkResultBtn = findViewById(R.id.checkGraphBtn);
+        switchButton = findViewById(R.id.switchbtn);
+
+
+        switchButton.setChecked(false);
+        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                if (bChecked) {
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.relaxmusic);
+                    mediaPlayer.start();
+                    Toast.makeText(MainActivity.this, "MUSIC ON", Toast.LENGTH_SHORT).show();
+                } else {
+                    mediaPlayer.stop();
+                    Toast.makeText(MainActivity.this, "MUSIC OFF", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
 
         setButton.setOnClickListener(new View.OnClickListener() {
@@ -102,21 +123,15 @@ public class MainActivity extends AppCompatActivity {
                                  **/
                                 switch (which){
                                     case 0:
-                                        which = 1;
+                                        which = 10;
                                         break;
                                     case 1:
                                         which = 20;
                                         break;
                                     case 2:
-                                        which = 30;
-                                        break;
-                                    case 3:
                                         which = 40;
                                         break;
-                                    case 4:
-                                        which = 50;
-                                        break;
-                                    case 5:
+                                    case 3:
                                         which = 60;
                                         break;
                                     default:
@@ -211,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
                 if (realm.where(Day.class).contains("dayName", formatedDate).count() == 0) {
                     Day day = new Day(formatedDate);
                     day.setTimeData(timeData);
-                    day.setTimeData(50);
                     realm.beginTransaction();
                     realm.copyToRealm(day);
                     realm.commitTransaction();
@@ -274,6 +288,9 @@ public class MainActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+
+
 
 
 }

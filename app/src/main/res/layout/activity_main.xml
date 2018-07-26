@@ -14,10 +14,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="21dp"
-        android:text="My Study Time"
+        android:layout_marginTop="28dp"
+        android:text="Study Focus"
         android:textColor="#ffffff"
-        android:textSize="50dp" />
+        android:textSize="45sp"
+        app:fontFamily="@font/quicksand_light" />
 
     <ImageView
         android:id="@+id/circle"
@@ -28,6 +29,14 @@
         android:layout_marginTop="109dp"
         android:src="@drawable/circle" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/switchbtn"
+        android:layout_marginStart="-50dp"
+        android:layout_toEndOf="@+id/switchbtn"
+        android:src="@drawable/music" />
+
     <TextView
         android:id="@+id/timerView"
         android:layout_width="wrap_content"
@@ -37,22 +46,23 @@
         android:layout_marginTop="183dp"
         android:text="00:00"
         android:textColor="#ffffff"
-        android:textSize="70dp" />
+        android:textSize="70dp"
+        app:fontFamily="@font/quicksand_light" />
 
     <Button
         android:id="@+id/setButton"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/resetButton"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/button"
         android:text="SET"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_alignParentLeft="true" />
+        android:fontFamily="@font/dosis_bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="#ffffff" />
 
     <Button
         android:id="@+id/resetButton"
@@ -68,6 +78,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_alignParentRight="true"
+        android:fontFamily="@font/dosis_bold"
         android:layout_marginRight="27dp" />
 
     <Button
@@ -82,6 +93,7 @@
         android:textColor="#ffffff"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:fontFamily="@font/dosis_bold"
         android:layout_alignLeft="@+id/setButton" />
 
     <Button
@@ -95,6 +107,7 @@
         android:text="STOP"
         android:textColor="#ffffff"
         android:textSize="20sp"
+        android:fontFamily="@font/dosis_bold"
         android:textStyle="bold" />
 
     <Button
@@ -105,8 +118,19 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
         android:background="#4fe0e2"
+        android:fontFamily="@font/dosis_bold"
         android:text="Check Study Result"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+
+    <Switch
+        android:id="@+id/switchbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="266dp"
+        android:layout_marginEnd="50dp" />
 
 
 
